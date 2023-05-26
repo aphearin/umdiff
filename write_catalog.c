@@ -63,12 +63,15 @@ void write_catalog(int64_t n) {
 
   float *hist = NULL, *sfrh, *iclh, *mh, *smh, *vmph, *dvmaxh,
     *a_infall = NULL, *a_first_infall, *mpeak_cen;
+  int64_t *ihist = NULL, *idh, *upidh;
   int64_t num_elems = (n+1)*num_halos[n];
   check_realloc_s(hist, sizeof(float), 6*num_elems);
   check_realloc_s(a_infall, sizeof(float), 3*num_halos[n]);
+  check_realloc_s(ihist, sizeof(int64_t), 2*num_elems);
   a_first_infall = a_infall + num_halos[n];
   mpeak_cen = a_infall + num_halos[n]*2;
   memset(hist, 0, sizeof(float)*6*num_elems);
+  memset(ihist, 0, sizeof(int64_t)*2*num_elems);
   for (j=0; j<num_halos[n]; j++) {
     mpeak_cen[j] = 0;
     a_infall[j] = a_first_infall[j] = scales[n];
@@ -79,6 +82,8 @@ void write_catalog(int64_t n) {
   smh = mh+num_elems;
   vmph = smh+num_elems;
   dvmaxh = vmph+num_elems;
+  idh = ihist;
+  upidh = idh+num_elems;
   for (i=n; i>=0; i--) {
     if (i<n) {
       for (j=offsets[i]; j<offsets[i+1]; j++) {
@@ -109,6 +114,8 @@ void write_catalog(int64_t n) {
       smh[elem] = halos[j].sm;
       vmph[elem] = halos[j].vmp;
       dvmaxh[elem] = halos[j].rank1;
+      idh[elem] = halos[j].id;
+      upidh[elem] = halos[j].upid;
       if ((halos[j].upid < 0) && (halos[j].m > mpeak_cen[trid])) mpeak_cen[trid] = halos[j].m;
       if (i<n) {
 	assert(halos[j].descid >= offsets[i+1] && halos[j].descid < offsets[i+2]);
@@ -492,6 +499,8 @@ void write_catalog(int64_t n) {
       for (j=0; j<n+1; j++) fprintf(output, " %g", sfrh[toff+j]);
       for (j=0; j<n+1; j++) fprintf(output, " %g", vmph[toff+j]);
       for (j=0; j<n+1; j++) fprintf(output, " %g", dvmaxh[toff+j]);
+      for (j=0; j<n+1; j++) fprintf(output, " %"PRId64, idh[toff+j]);
+      for (j=0; j<n+1; j++) fprintf(output, " %"PRId64, upidh[toff+j]);
       fprintf(output, "\n");
     }
     fclose(output);
@@ -506,6 +515,7 @@ void write_catalog(int64_t n) {
   
   free(a_infall);
   free(hist);
+  free(ihist);
 }
 
 
