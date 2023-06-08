@@ -115,7 +115,7 @@ void write_catalog(int64_t n) {
       vmph[elem] = halos[j].vmp;
       dvmaxh[elem] = halos[j].rank1;
       idh[elem] = halos[j].id;
-      upidh[elem] = halos[j].upid;
+      upidh[elem] = halos[halos[j].upid].id;
       if ((halos[j].upid < 0) && (halos[j].m > mpeak_cen[trid])) mpeak_cen[trid] = halos[j].m;
       if (i<n) {
 	assert(halos[j].descid >= offsets[i+1] && halos[j].descid < offsets[i+2]);
